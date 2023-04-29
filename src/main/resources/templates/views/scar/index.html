@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div class="layui-card">
+    <div class="layui-card-header">shipment info</div>
+    <div class="layui-card-body">
+        <form class="layui-form">
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                    <button class="layui-btn" lay-submit lay-filter="searchForm">Refresh</button>
+<!--                    <button class="layui-btn layui-btn-danger" type="button"  id="del-batch">批量删除</button>-->
+                </div>
+            </div>
+        </form>
+
+        <table id="shipmentTable" lay-filter="test"></table>
+
+
+        <link rel="stylesheet" href="/layui/css/layui.css">
+        <script src="/layui/layui.js"></script>
+        <script type="text/javascript" src="/js/jquery.js" ></script>
+
+        <script type="text/javascript">
+            layui.use(['table','form','layer'], function(){
+                var table = layui.table
+                layui.form.on('submit(searchForm)',function (data){
+                    tableInstance.config.request = Object.assign(tableInstance.config.request,data.field)
+                    console.log(tableInstance.config.request)
+                    console.log(tableInstance)
+                    tableInstance.reload()
+                    return false
+                })
+
+                //第一个实例
+                let tableInstance = layui.table.render({
+                    elem: '#shipmentTable'
+                    ,height: 500
+                    ,url: '/shipment/findAll' //数据接口
+                    ,page: true //开启分页
+                    ,parseData: function (res){
+                        res.count = res.data.count
+                        res.data = res.data.rows
+                        return res
+                    }
+                    ,response: {
+                        statusName: 'code' //规定数据状态的字段名称，默认：code
+                        ,statusCode: 20000 //规定成功的状态码，默认：0
+                        ,msgName: 'message' //规定状态信息的字段名称，默认：msg
+                        ,countName: 'count' //规定数据总数的字段名称，默认：count
+                        ,dataName: 'data' //规定数据列表的字段名称，默认：data
+                    }
+                    ,cols: [[ //表头
+                        {type: 'checkbox'},
+                        {field: 'id', title: 'ID', width: 80},
+                        {field: 'shipmentMethod', title: 'shipmentMethod', width:160},
+                        {field: 'address', title: 'address', width: 250 },
+                        {field: 'createTime', title: 'createTime', sort: true},
+                        {title: 'set', fixed: 'right', width: 120, templet: '<div><button type="button" class="layui-btn layui-btn-sm" onclick="updateModel(`{{d.id}}`)"><i class="layui-icon">&#xe642;</i></button><button type="button" class="layui-btn layui-btn-danger layui-btn-sm" onclick="removeModel(`{{d.id}}`)" ><i class="layui-icon">&#xe640;</i></button></div>'}
+                    ]]
+                });
+
+
+                window.updateModel = function (id){
+                    $.post(`/shipment/query/${id}`,function (res){
+                        layui.layer.open({
+                            type: 2,
+                            content: './editor.html', //数组第二项即吸附元素选择器或者DOM
+                            area: ['700px','500px'],
+                            maxmin: true,
+                            title: 'INFO',
+                            shade : false ,
+                            zIndex: layer.zIndex,
+                            success: function(layero, index){
+                                layer.setTop(layero);
+                                layer.iframeAuto(index)
+                                let body = layer.getChildFrame('body', index);
+                                let iframeWin = window[layero.find('iframe')[0]['name']]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+                                $.each(res.data.model,function (key,value){
+                                    body.find(`[name=${key}]`).val(value)
+                                })
+                                iframeWin.model = "/shipment/update"
+                            },
+                        });
+                    })
+                }
+                $('#del-batch').on('click', function (){
+                    let checkStatus = table.checkStatus('shipmentTable');
+                    let data = checkStatus.data;
+                    $.ajax('/shipment/del-batch', {
+                        type: 'POST',
+                        contentType: 'application/json;charset=utf-8',
+                        data: JSON.stringify(data.map(item => item.id)),
+                        success: function (res){
+                            layer.msg(res.message)
+                            if (res.success){
+                                tableInstance.reload()
+                            }
+                        }
+                    })
+                })
+                window.removeModel = function (id){
+                    $.get(`/shipment/remove/${id}`,function (res){
+                        if (res.success){
+                            tableInstance.reload()
+                        }else{
+                            layui.layer.msg(res.message)
+                        }
+                    })
+                }
+
+            });
+        </script>
+
+    </div>
+</div>
+
+
+</body>
+</html>

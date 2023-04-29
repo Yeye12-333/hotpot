@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <title></title>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+
+<div class="shopping-car-container">
+    <div class="car-headers-menu">
+        <div class="row">
+            <div class="col-md-1 car-menu">
+                <label><input type="checkbox" id="check-goods-all"/><span id="checkAll">全选</span></label>
+            </div>
+            <div class="col-md-3 car-menu">菜品参数</div>
+            <div class="col-md-1 car-menu">单价</div>
+            <div class="col-md-1 car-menu">数量</div>
+            <div class="col-md-1 car-menu">金额</div>
+            <div class="col-md-2 car-menu">操作</div>
+        </div>
+    </div>
+    <div class="goods-content">
+        <!--goods display-->
+
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body bottom-menu-include">
+            <div class="col-md-1 check-all-bottom bottom-menu">
+                <label>
+                    <input type="checkbox" id="checked-all-bottom"/>
+                    <span id="checkAllBottom">全选</span>
+                </label>
+            </div>
+            <div class="col-md-1 bottom-menu">
+				<span id="deleteMulty">
+						删除
+				</span>
+            </div>
+            <div class="col-md-6 bottom-menu">
+
+            </div>
+            <div class="col-md-2 bottom-menu">
+                <span>已选菜品 <span id="selectGoodsCount">0</span> 件</span>
+            </div>
+            <div class="col-md-1 bottom-menu">
+                <span>合计：<span id="selectGoodsMoney">0.00</span></span>
+            </div>
+            <div class="col-md-1 bottom-menu submitData submitDis">
+                结算
+            </div>
+        </div>
+    </div>
+    <!--删除确认弹框-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="deleteItemTip" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">提示</h4>
+                </div>
+                <div class="modal-body">
+                    确认删除此菜品？
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary deleteSure">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--是否勾选菜品提示-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="selectItemTip" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">提示</h4>
+                </div>
+                <div class="modal-body">
+                    请选择要删除的菜品！
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--批量删除菜品-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="deleteMultyTip" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">提示</h4>
+                </div>
+                <div class="modal-body">
+                    确认删除选择的菜品！
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary deleteMultySure">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/js/scar.js"></script>
+
+<script type="text/javascript" >
+
+    $.get('/scar/findAll', function (res){
+        console.log(res)
+        res.data.rows.forEach(item =>{
+            $('.goods-content').append(`<div class="goods-item" data-id="${item.id}">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="col-md-1 car-goods-info"><label><input type="checkbox" class="goods-list-item"></label>
+                        </div>
+                        <div class="col-md-3 car-goods-info goods-image-column"><img class="goods-image" src="${item.cover}"
+                                                                                     style="width: 100px; height: 100px;"><span
+                                id="goods-info">${item.name}</span></div>
+                        <div class="col-md-1 car-goods-info goods-price"><span>￥</span><span class="single-price">${item.price}</span>
+                        </div>
+                        <div class="col-md-1 car-goods-info goods-counts">
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default car-decrease">-</button>
+                                </div>
+                                <input type="number" class="form-control goods-count" value="${item.quantity}">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default car-add">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-1 car-goods-info goods-money-count"><span>￥</span><span
+                                class="single-total">${item.quantity * item.price}</span></div>
+                        <div class="col-md-2 car-goods-info goods-operate">
+                            <button type="button" class="btn btn-danger item-delete">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`)
+        })
+
+        render()
+    })
+
+</script>
+
+</body>
+</html>

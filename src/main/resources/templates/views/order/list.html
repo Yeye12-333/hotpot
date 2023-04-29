@@ -1,0 +1,54 @@
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/table.css">
+    <script type="text/javascript" src="/js/jquery.js" ></script>
+</head>
+<body>
+
+
+<div align="center" class="table_title">
+    <table border="1" width="600px" id="table" class="table table-hover table-mc-light-blue">
+        <thead>
+        <tr>
+            <th>订单号</th>
+            <th>菜品名称</th>
+            <th>菜品图片</th>
+            <th>订单总价</th>
+            <th>订单总数</th>
+            <th>订单状态</th>
+            <th>订单操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item:${data}">
+            <td th:text="${item.id}">${item.id}</td>
+            <td th:text="${item.name}">${item.name}</td>
+            <td>
+                <img style="width: 100px;" th:src="${item.cover}" alt="">
+            </td>
+            <td th:text="${item.total}">${item.total}</td>
+            <td th:text="${item.quantity}">${item.quantity}</td>
+            <td th:text="${item.status == 1 ? '待出餐' : '已出餐'}">${item.status}</td>
+            <td>
+                <a th:href="'javascript: removeOrder(`'+ ${item.id} + '`)'">删除订单</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script th:inline="javascript">
+    function removeOrder(id) {
+        $.get('/order/remove/' + id, function (res) {
+            alert('删除订单成功!')
+            location.reload()
+        })
+    }
+</script>
+</body>
+</html>

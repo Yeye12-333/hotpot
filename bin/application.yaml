@@ -1,0 +1,20 @@
+server:
+  port: 8091
+spring:
+  datasource:
+    username: chinaparty
+    password: 09b2ff4dd8
+    url: jdbc:mysql://1.15.137.216:3306/chinaparty?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2b8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+alioss:
+  endPoint: oss-cn-shenzhen.aliyuncs.com
+  bucketName: decoration01
+  keyId: LTAI4G2q6gv7dC7LP8jvZpd7
+  keySecret: IOPQCZkFPYKp1Yjwcn1bQoOHXEGYeb
+logging:
+  level.com.runnersoftware.hot_pot_shop: debug
